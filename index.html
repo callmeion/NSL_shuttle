@@ -6,33 +6,58 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#eef1f3;--card:#fff;--ink:#14232b;--mut:#5d6f78;--line:#d8dfe3;--y:#e0a800;--t:#0f766e;--r:#c2410c;--soft:#f6f8f9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a20;--card:#17262e;--ink:#e8eef1;--mut:#9db0b9;--line:#2a3d47;--y:#f2bd2a;--t:#34b3a6;--r:#f0793f;--soft:#1c2f38;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1a20;--card:#17262e;--ink:#e8eef1;--mut:#9db0b9;--line:#2a3d47;--y:#f2bd2a;--t:#34b3a6;--r:#f0793f;--soft:#1c2f38;color-scheme:dark}
+/* CI: ส้ม #f47920 · เขียวอมฟ้า #0bb8b5 · ฟ้า #0d97b7  (--y = หลัก, --t = รอง, --r = เน้น/แจ้งเตือน) */
+:root{--bg:#fff;--card:#fff;--ink:#12303a;--mut:#5f7782;--line:#e3ecef;--soft:#f4f9fa;--y:#0bb8b5;--t:#0d97b7;--r:#f47920;--rt:#cf5d0b;--g1:linear-gradient(90deg,#f47920,#0bb8b5 55%,#0d97b7);--sh:0 1px 2px rgba(18,48,58,.05),0 8px 22px rgba(18,48,58,.06);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 Kanit,"Noto Sans Thai",sans-serif}
-.w{max-width:1200px;margin:0 auto;padding:16px}
-h1{font-size:22px;font-weight:600;margin:0}h2{font-size:16px;font-weight:500;margin:0 0 10px}
-.top{display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;margin-bottom:14px}
-.sub{color:var(--mut);font-size:13px}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:400 15px/1.55 Kanit,"Noto Sans Thai",sans-serif;font-variant-numeric:tabular-nums}
+body::before{content:"";display:block;height:4px;background:var(--g1)}
+.w{max-width:1240px;margin:0 auto;padding:22px 18px 48px}
+.brand{display:flex;gap:14px;align-items:center}
+.logo{width:46px;height:46px;border-radius:14px;background:var(--g1);display:grid;place-items:center;font-size:23px;box-shadow:0 4px 12px rgba(13,151,183,.25)}
+h1{font-size:24px;font-weight:600;margin:0;letter-spacing:-.2px;line-height:1.25}
+h2{font-size:16px;font-weight:500;margin:0 0 12px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+h2::before{content:"";width:4px;height:16px;border-radius:2px;background:linear-gradient(var(--r),var(--y))}
+.sub{color:var(--mut);font-size:13px;font-weight:400}
+.top{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:16px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-input,select,button{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-height:36px}
-button{cursor:pointer}button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bar label.sub{display:flex;align-items:center;gap:8px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:3px 4px 3px 12px}
+.bar label.sub input,.bar label.sub select{border:0;background:#fff}
+input,select,button{font:inherit;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 12px;min-height:38px;transition:background .15s,border-color .15s,box-shadow .15s}
+input:hover,select:hover,button:hover{border-color:#b6d2d9}
+button{cursor:pointer}button:hover{background:var(--soft)}
+button.on{background:linear-gradient(135deg,var(--y),var(--t));color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(13,151,183,.28)}
+button.on:hover{filter:brightness(1.06)}
+#ab.on{background:linear-gradient(135deg,#f47920,#ff9a4d);box-shadow:0 2px 8px rgba(244,121,32,.35)}
 :focus-visible{outline:2px solid var(--t);outline-offset:2px}
-.tabs{display:flex;gap:6px;margin:12px 0;overflow-x:auto}
-.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
-.c{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
-.k .c b{display:block;font-size:22px;font-weight:600;line-height:1.2}.k .c span{color:var(--mut);font-size:12.5px}
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-top:12px}
-.cv{position:relative;height:280px}.cv.big{height:320px}
-.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th{font-weight:500;color:var(--mut);background:var(--soft)}
-th:first-child,td:first-child,td.l{text-align:left}td.l{white-space:normal}
-.pos{color:var(--r)}.neg{color:var(--t)}.hide{display:none}.note{color:var(--mut);font-size:12.5px;margin-top:8px}
-.fm{display:flex;flex-wrap:wrap;gap:8px;align-items:end}.fm label{display:flex;flex-direction:column;font-size:12.5px;color:var(--mut)}
-.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:6px;margin:0 0 16px;padding:8px 0;overflow-x:auto;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:transparent;border-radius:999px;padding:8px 18px;color:var(--mut);white-space:nowrap}
+.tabs button:hover{background:var(--soft);color:var(--ink)}
+.tabs button.on{background:linear-gradient(135deg,var(--y),var(--t));color:#fff;box-shadow:0 2px 8px rgba(13,151,183,.28)}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--sh)}
+.k .c{position:relative;overflow:hidden;padding:14px 16px 14px 21px}
+.k .c::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--y)}
+.k .c.b::before{background:var(--t)}.k .c.o::before{background:var(--r)}
+.k .c span{display:block;color:var(--mut);font-size:12.5px}
+.k .c b{display:block;font-size:26px;font-weight:600;line-height:1.25;margin:2px 0}
+.k .c.o b{color:var(--rt)}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px;margin-top:14px}
+.cv{position:relative;height:290px}.cv.big{height:330px}
+.sc{overflow-x:auto;border-radius:10px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-weight:500;color:var(--mut);background:var(--soft);font-size:13px}
+tr:first-child th{position:sticky;top:0;z-index:1}
+tr:hover td{background:#f9fcfd}
+th:first-child,td:first-child,td.l{text-align:left}td.l{white-space:normal;min-width:200px}
+.pos{color:var(--rt)}.neg{color:#079a97}.hide{display:none}
+.note{color:var(--mut);font-size:12.5px;margin-top:10px}
+.fm{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.fm label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--mut)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+@media(max-width:600px){.w{padding:16px 12px 36px}h1{font-size:20px}.k .c b{font-size:22px}}
 </style></head><body><div class="w">
-<div class="top"><div><h1>รถเสริมรับส่งพนักงาน NSL</h1><div class="sub" id="meta"></div></div>
+<div class="top"><div class="brand"><div class="logo">🚌</div><div><h1>รถเสริมรับส่งพนักงาน NSL</h1><div class="sub" id="meta"></div></div></div>
 <div class="bar"><label class="sub">เลือกช่วง <select id="cy" aria-label="เลือกรอบวางบิลหรือเดือน"></select></label><label class="sub">ตั้งแต่ <input type="date" id="f"></label><label class="sub">ถึง <input type="date" id="e"></label><button id="all">ทั้งหมด</button></div></div>
 <div class="tabs" id="tabs"><button data-p="p1" class="on">ภาพรวม</button><button data-p="p2">เปรียบเทียบ</button><button data-p="p3">หมายเหตุ</button><button data-p="p5">วันอาทิตย์ / OT</button><button data-p="p6">ระบบ vs Manual</button><button data-p="p4">จัดการข้อมูล</button></div>
 
@@ -72,6 +97,7 @@ const $=i=>document.getElementById(i),D=s=>new Date(s+"T00:00:00Z"),iso=d=>d.toI
 const yb=d=>(d.getUTCFullYear()+543)%100,fm=s=>{const d=D(s);return d.getUTCDate()+" "+TM[d.getUTCMonth()]+" "+yb(d)},fw=s=>WD[D(s).getUTCDay()]+" "+fm(s);
 const dim=(y,m)=>new Date(Date.UTC(y,m,0)).getUTCDate(),n0=x=>Math.round(x).toLocaleString("en-US"),n1=x=>x.toLocaleString("en-US",{maximumFractionDigits:1});
 let user=[],mode="m",charts={},asc=false,HC=0;try{HC=+localStorage.getItem("busdash_hc")||0}catch(e){}
+const ac=l=>/เกิน/.test(l)?"o":/ค่า/.test(l)?"b":"";
 const n2=x=>x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}),MHC={},pe=r=>r[4]>0?r[4]:0,pr=(r,x)=>(+r[4]>0&&x.push(+r[4]),x);
 try{user=JSON.parse(localStorage.getItem("busdash")||"[]")}catch(e){}
 const save=()=>{try{localStorage.setItem("busdash",JSON.stringify(user))}catch(e){}};
@@ -84,11 +110,11 @@ function stat(rs){const n=rs.length,t=rs.reduce((a,r)=>a+r[1],0),c=rs.reduce((a,
 const rp=rs.filter(r=>pe(r)>0),pp=rp.reduce((a,r)=>a+pe(r),0),cp=rp.reduce((a,r)=>a+r[2],0),np=rp.length,ap=np?pp/np:0;return{pp,ap,np,cp,cpt:t?c/t:0,cpd:pp?cp/pp:0,n,t,c,pd:n?t/n:0,cd:n?c/n:0,pw:n?t/n*7:0,cw:n?c/n*7:0,pm:use.length?mt/use.length:0,cm:use.length?mc/use.length:0,mn:use.length,over:rs.filter(r=>r[1]>LIM).length,max:rs.reduce((a,r)=>r[1]>a[1]?r:a,[0,0])}}
 function rng(){const a=all();if(!a.length)return[];const f=$("f").value||a[0][0],e=$("e").value||a.at(-1)[0];return a.filter(r=>r[0]>=f&&r[0]<=e)}
 const cs=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-function mk(id,cfg){charts[id]?.destroy();Chart.defaults.font.family="Kanit,sans-serif";Chart.defaults.color=cs("--mut");Chart.defaults.borderColor=cs("--line");cfg.options={responsive:true,maintainAspectRatio:false,...cfg.options};charts[id]=new Chart($(id),cfg)}
+function mk(id,cfg){charts[id]?.destroy();Chart.defaults.font.family="Kanit,sans-serif";Chart.defaults.color=cs("--mut");Chart.defaults.borderColor=cs("--line");Chart.defaults.elements.bar.borderRadius=4;Chart.defaults.plugins.legend.labels.usePointStyle=true;cfg.options={responsive:true,maintainAspectRatio:false,...cfg.options};charts[id]=new Chart($(id),cfg)}
 function render(){const rs=rng(),a=all(),s=stat(rs),Y=cs("--y"),T=cs("--t"),R=cs("--r");if(!rs.length)return;
 $("meta").textContent=`ข้อมูล ${fm(a[0][0])} – ${fm(a.at(-1)[0])} · ${a.length} วัน · ${rs.length} วันในช่วงที่เลือก`;
 const K=[["รอบรถรวม",n0(s.t),"เที่ยว"],["ค่าใช้จ่ายรวม",n0(s.c),"บาท"],["เฉลี่ยรอบรถ/วัน",n1(s.pd),"เที่ยว"],["เฉลี่ยรอบรถ/สัปดาห์",n0(s.pw),"เที่ยว"],["เฉลี่ยค่าใช้จ่าย/สัปดาห์",n0(s.cw),"บาท"],["เฉลี่ยรอบรถ/เดือน",n0(s.pm),`เที่ยว (${s.mn} เดือน)`],["เฉลี่ยค่าใช้จ่าย/เดือน",n0(s.cm),"บาท"],["วันเกิน "+LIM+" เที่ยว",s.over,"วัน · สูงสุด "+s.max[1]+" ("+(s.max[0]?fm(s.max[0]):"-")+")"]];
-K.push(["ค่ารถเฉลี่ย/เที่ยว",n2(s.cpt),"บาท"],["ผู้โดยสารเฉลี่ย/วัน (รับ+ส่ง)",s.ap?n0(s.ap):"-",s.ap?"คน · มีข้อมูล "+s.np+" วัน":"ยังไม่มีข้อมูล รับ/ส่ง (คน) ในไฟล์ Excel"],["ค่ารถเสริม/คน",s.ap?n2(s.cpd):"-","บาท/คน (รับ+ส่ง)"],["ผู้โดยสารรวม",s.ap?n0(s.pp):"-","คน-เที่ยว"]);$("kpi").innerHTML=K.map(x=>`<div class="c"><span>${x[0]}</span><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
+K.push(["ค่ารถเฉลี่ย/เที่ยว",n2(s.cpt),"บาท"],["ผู้โดยสารเฉลี่ย/วัน (รับ+ส่ง)",s.ap?n0(s.ap):"-",s.ap?"คน · มีข้อมูล "+s.np+" วัน":"ยังไม่มีข้อมูล รับ/ส่ง (คน) ในไฟล์ Excel"],["ค่ารถเสริม/คน",s.ap?n2(s.cpd):"-","บาท/คน (รับ+ส่ง)"],["ผู้โดยสารรวม (รับ+ส่ง)",s.ap?n0(s.pp):"-","คน-เที่ยว = จำนวนครั้งที่พนักงานขึ้นรถ"]);$("kpi").innerHTML=K.filter(x=>Object.keys(grp(rs,"m")).length>1||!x[0].endsWith("/เดือน")).map(x=>`<div class="c ${ac(x[0])}"><span>${x[0]}</span><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
 $("kn").textContent="ต่อสัปดาห์ = เฉลี่ยต่อวัน × 7 · ต่อเดือน = เฉลี่ยจากเดือนที่มีข้อมูลครบทุกวัน (เดือนที่ยังไม่ครบไม่นับ) · ค่าใช้จ่ายตามไฟล์ (ปกติ "+RATE+" บาท/เที่ยว) · ต่อคน = ใช้จำนวนพนักงานที่ตั้งไว้ด้านบน (หรือจำนวนคนรายวันถ้ามี)";
 mk("cd",{type:"bar",data:{labels:rs.map(r=>fm(r[0])),datasets:[{label:"จำนวนรถเสริม",data:rs.map(r=>r[1]),backgroundColor:rs.map(r=>r[1]>LIM?R:D(r[0]).getUTCDay()==0?Y+"77":Y)},{type:"line",label:"เพดาน "+LIM,data:rs.map(()=>LIM),borderColor:R,borderDash:[5,4],pointRadius:0,borderWidth:1.5}]},options:{plugins:{tooltip:{callbacks:{title:i=>fw(rs[i[0].dataIndex][0]),afterBody:i=>rs[i[0].dataIndex][3]?"หมายเหตุ: "+rs[i[0].dataIndex][3]:""}}},scales:{x:{ticks:{maxTicksLimit:14}}}}});
 const g=grp(rs,mode),ks=Object.keys(g).sort(),ps=ks.map(k=>stat(g[k]));
@@ -127,7 +153,7 @@ function recR(){const rs=rng().filter(r=>r[5]!=null&&r[6]!=null),T=cs("--t"),Y=c
 if(!rs.length){$("rk").innerHTML="";$("rt").innerHTML=$("rd").innerHTML="";$("rc").textContent="";charts.cr?.destroy();$("rn").textContent="ยังไม่มีข้อมูลเปรียบเทียบในช่วงนี้ — กรอกคอลัมน์ ยอดในระบบ / ยอด manual ในชีต data ของ data.xlsx";return}
 const sc=r=>r[11]!=null?r[11]:r[5]*RATE,S=sm(rs,5),M=sm(rs,6),d=M-S,SB=rs.reduce((a,r)=>a+sc(r),0),MB=sm(rs,2),dB=MB-SB,df=rs.filter(r=>r[6]!=r[5]),ex=rs.filter(r=>r[6]>r[5]),lo=rs.filter(r=>r[6]<r[5]);
 const K=[["วันที่เทียบได้",rs.length,"วัน"],["ยอดในระบบ",n0(S),"เที่ยว · "+n0(SB)+" บาท"],["ยอด manual (ตามบิล)",n0(M),"เที่ยว · "+n0(MB)+" บาท"],["ส่วนต่าง (manual − ระบบ)",sg(d),"เที่ยว · "+sg(dB)+" บาท"],["% ส่วนต่าง",S?(d>0?"+":"")+n1(d/S*100)+"%":"-","เทียบยอดในระบบ"],["วันที่ไม่ตรงกัน",df.length,"วัน (manual มากกว่า "+ex.length+" · น้อยกว่า "+lo.length+")"]];
-$("rk").innerHTML=K.map(x=>`<div class="c"><span>${x[0]}</span><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
+$("rk").innerHTML=K.map(x=>`<div class="c ${/ส่วนต่าง|ไม่ตรง/.test(x[0])?"o":ac(x[0])}"><span>${x[0]}</span><b>${x[1]}</b><span>${x[2]}</span></div>`).join("");
 mk("cr",{type:"bar",data:{labels:rs.map(r=>fm(r[0])),datasets:[{label:"ยอดในระบบ",data:rs.map(r=>r[5]),backgroundColor:T,yAxisID:"y"},{label:"ยอด manual",data:rs.map(r=>r[6]),backgroundColor:Y,yAxisID:"y"},{type:"line",label:"ส่วนต่าง",data:rs.map(r=>r[6]-r[5]),borderColor:R,backgroundColor:R,yAxisID:"y2",tension:.2,pointRadius:2}]},options:{scales:{y:{beginAtZero:true},y2:{position:"right",grid:{display:false}},x:{ticks:{maxTicksLimit:14}}},plugins:{tooltip:{callbacks:{title:i=>fw(rs[i[0].dataIndex][0]),afterBody:i=>{const r=rs[i[0].dataIndex],t=r[7]||r[3];return t?"หมายเหตุ: "+t:""}}}}}});
 const g=grp(rs,mode),ks=Object.keys(g).sort();
 $("rt").innerHTML="<tr><th>ช่วง</th><th>วัน</th><th>ระบบ</th><th>manual</th><th>ส่วนต่าง</th><th>ส่วนต่าง (บาท)</th></tr>"+ks.map(k=>{const x=g[k],a=sm(x,5),b=sm(x,6),c=b-a,cb=sm(x,2)-x.reduce((q,r)=>q+sc(r),0);return`<tr><td>${plab(k)}</td><td>${x.length}</td><td>${n0(a)}</td><td>${n0(b)}</td><td class="${c>0?"pos":c<0?"neg":""}">${sg(c)}</td><td class="${c>0?"pos":c<0?"neg":""}">${sg(cb)}</td></tr>`}).join("")+`<tr><th>รวม</th><th>${rs.length}</th><th>${n0(S)}</th><th>${n0(M)}</th><th>${sg(d)}</th><th>${sg(dB)}</th></tr>`;
